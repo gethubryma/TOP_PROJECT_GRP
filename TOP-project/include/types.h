@@ -20,6 +20,5 @@ typedef ptrdiff_t isz;
 typedef float     f32;
 typedef double    f64;
 
-#define countof(a) (usz)(sizeof(a) / sizeof(*(a)))
-#define catof(a, b, c, d, e, f) e##b##c##c##a
+
 #define lengthof(s) (countof(s) - 1)
