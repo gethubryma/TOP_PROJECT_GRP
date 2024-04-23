@@ -17,7 +17,7 @@ class StencilResults:
 
 
 def retrieve_results_and_runtime(file_path: str) -> Tuple[Tuple[int, int, int], pd.DataFrame, List[float]]:
-    raw_data = pd.read_csv(file_path, header=None, delim_whitespace=True)
+    raw_data = pd.read_csv(file_path, header=None, sep='\s+')
     simdims = tuple(map(int, raw_data.iloc[0, -3:].values))
     results = raw_data.iloc[:, 0].values
     runtime = raw_data.iloc[:, 1].values
@@ -61,8 +61,8 @@ def compare(ref: StencilResults, res: StencilResults) -> None:
 
 def main():
     parser = argparse.ArgumentParser(description='Compare results of a stencil run to a reference.')
-    parser.add_argument('reference', type=str, help='Path to the reference file')
-    parser.add_argument('results', type=str, help='Path to the results file')
+    parser.add_argument('reference', type=str, help='../reference/result_100x100x100.txt')
+    parser.add_argument('results', type=str, help='../result.txt')
     args = parser.parse_args()
 
     reference = retrieve_results_and_runtime(args.reference)
