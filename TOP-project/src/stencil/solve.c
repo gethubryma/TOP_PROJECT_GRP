@@ -3,6 +3,56 @@
 #include <assert.h>
 #include <math.h>
 
+
+#define BLOCK_SIZE_X 64
+#define BLOCK_SIZE_Y 32
+#define BLOCK_SIZE_Z 32
+
+#define min(a, b) ((a) < (b) ? (a) : (b))
+
+void solve_jacobi(mesh_t* A, mesh_t const* B, mesh_t* C) {
+    assert(A->dim_x == B->dim_x && B->dim_x == C->dim_x);
+    assert(A->dim_y == B->dim_y && B->dim_y == C->dim_y);
+    assert(A->dim_z == B->dim_z && B->dim_z == C->dim_z);
+
+    usz const dim_x = A->dim_x;
+    usz const dim_y = A->dim_y;
+    usz const dim_z = A->dim_z;
+
+    for(usz kk = STENCIL_ORDER; kk < dim_z - STENCIL_ORDER ; kk+=BLOCK_SIZE_Z ){
+        for(usz jj = STENCIL_ORDER; jj < dim_y - STENCIL_ORDER ; jj += BLOCK_SIZE_Y){
+            for(usz ii = STENCIL_ORDER; ii < dim_x - STENCIL_ORDER ; ii += BLOCK_SIZE_X){
+
+                for (usz k = kk; k < min(dim_z - STENCIL_ORDER, kk + BLOCK_SIZE_Z); ++k) {
+                    for (usz j =  jj ; j < min(dim_y - STENCIL_ORDER,jj + BLOCK_SIZE_Y); ++j) {
+                        for (usz i = ii ; i < min(dim_x - STENCIL_ORDER, ii + BLOCK_SIZE_X); ++i) {
+                            C->cells[i][j][k].value = A->cells[i][j][k].value * B->cells[i][j][k].value;
+
+                            for (usz o = 1; o <= STENCIL_ORDER; ++o) {
+                                C->cells[i][j][k].value += A->cells[i + o][j][k].value *
+                                                        B->cells[i + o][j][k].value / pow(17.0, (f64)o);
+                                C->cells[i][j][k].value += A->cells[i - o][j][k].value *
+                                                        B->cells[i - o][j][k].value / pow(17.0, (f64)o);
+                                C->cells[i][j][k].value += A->cells[i][j + o][k].value *
+                                                        B->cells[i][j + o][k].value / pow(17.0, (f64)o);
+                                C->cells[i][j][k].value += A->cells[i][j - o][k].value *
+                                                        B->cells[i][j - o][k].value / pow(17.0, (f64)o);
+                                C->cells[i][j][k].value += A->cells[i][j][k + o].value *
+                                                        B->cells[i][j][k + o].value / pow(17.0, (f64)o);
+                                C->cells[i][j][k].value += A->cells[i][j][k - o].value *
+                                                        B->cells[i][j][k - o].value / pow(17.0, (f64)o);
+                            }
+                        }
+                    } 
+                }
+            }    
+        }        
+    }
+    mesh_copy_core(A, C);
+}
+
+/*
+
 void solve_jacobi(mesh_t* A, mesh_t const* B, mesh_t* C) {
     assert(A->dim_x == B->dim_x && B->dim_x == C->dim_x);
     assert(A->dim_y == B->dim_y && B->dim_y == C->dim_y);
@@ -36,3 +86,4 @@ void solve_jacobi(mesh_t* A, mesh_t const* B, mesh_t* C) {
 
     mesh_copy_core(A, C);
 }
+*/
