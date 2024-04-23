@@ -20,7 +20,7 @@ mesh_t mesh_new(usz dim_x, usz dim_y, usz dim_z, mesh_kind_t kind) {
         }
 
         for (usz j = 0; j < dim_y + ghost_size; ++j) {
-            cells[i][j] = NULL /*malloc((dim_z + ghost_size) * sizeof(cell_t))*/;
+            cells[i][j] = malloc((dim_z + ghost_size) * sizeof(cell_t));
             if (cells[i][j] == NULL) {
                 error(
                     "failed to allocate dimension Z of mesh of size %zu bytes", dim_z + ghost_size
