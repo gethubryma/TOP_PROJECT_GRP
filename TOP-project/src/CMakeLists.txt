@@ -1,4 +1,4 @@
-find_package(MPI REQUIRED)
+#find_package(MPI REQUIRED)
 include_directories(${MPI_INCLUDE_PATH})
 
 add_library(stencil SHARED stencil/config.c stencil/comm_handler.c stencil/mesh.c stencil/init.c stencil/solve.c)

@@ -125,15 +125,16 @@ static void ghost_exchange_left_right(
     for (usz i = x_start; i < x_start + STENCIL_ORDER; ++i) {
         for (usz j = 0; j < mesh->dim_y; ++j) {
             for (usz k = 0; k < mesh->dim_z; ++k) {
+                usz idx = i * mesh->dim_y * mesh->dim_z + j * mesh->dim_z + k;
                 switch (comm_kind) {
                     case COMM_KIND_SEND_OP:
                         MPI_Send(
-                            &mesh->cells[i][j][k].value, 1, MPI_DOUBLE, target, 0, MPI_COMM_WORLD
+                            &mesh->cells.value[idx], 1, MPI_DOUBLE, target, 0, MPI_COMM_WORLD
                         );
                         break;
                     case COMM_KIND_RECV_OP:
                         MPI_Recv(
-                            &mesh->cells[i][j][k].value,
+                            &mesh->cells.value[idx],
                             1,
                             MPI_DOUBLE,
                             target,
@@ -149,6 +150,7 @@ static void ghost_exchange_left_right(
         }
     }
 }
+
 
 static void ghost_exchange_top_bottom(
     comm_handler_t const* self, mesh_t* mesh, comm_kind_t comm_kind, i32 target, usz y_start
@@ -160,15 +162,16 @@ static void ghost_exchange_top_bottom(
     for (usz i = 0; i < mesh->dim_x; ++i) {
         for (usz j = y_start; j < y_start + STENCIL_ORDER; ++j) {
             for (usz k = 0; k < mesh->dim_z; ++k) {
+                usz idx = i * mesh->dim_y * mesh->dim_z + j * mesh->dim_z + k;
                 switch (comm_kind) {
                     case COMM_KIND_SEND_OP:
                         MPI_Send(
-                            &mesh->cells[i][j][k].value, 1, MPI_DOUBLE, target, 0, MPI_COMM_WORLD
+                            &mesh->cells.value[idx], 1, MPI_DOUBLE, target, 0, MPI_COMM_WORLD
                         );
                         break;
                     case COMM_KIND_RECV_OP:
                         MPI_Recv(
-                            &mesh->cells[i][j][k].value,
+                            &mesh->cells.value[idx],
                             1,
                             MPI_DOUBLE,
                             target,
@@ -184,6 +187,7 @@ static void ghost_exchange_top_bottom(
         }
     }
 }
+
 
 static void ghost_exchange_front_back(
     comm_handler_t const* self, mesh_t* mesh, comm_kind_t comm_kind, i32 target, usz z_start
@@ -195,15 +199,16 @@ static void ghost_exchange_front_back(
     for (usz i = 0; i < mesh->dim_x; ++i) {
         for (usz j = 0; j < mesh->dim_y; ++j) {
             for (usz k = z_start; k < z_start + STENCIL_ORDER; ++k) {
+                usz idx = i * mesh->dim_y * mesh->dim_z + j * mesh->dim_z + k;
                 switch (comm_kind) {
                     case COMM_KIND_SEND_OP:
                         MPI_Send(
-                            &mesh->cells[i][j][k].value, 1, MPI_DOUBLE, target, 0, MPI_COMM_WORLD
+                            &mesh->cells.value[idx], 1, MPI_DOUBLE, target, 0, MPI_COMM_WORLD
                         );
                         break;
                     case COMM_KIND_RECV_OP:
                         MPI_Recv(
-                            &mesh->cells[i][j][k].value,
+                            &mesh->cells.value[idx],
                             1,
                             MPI_DOUBLE,
                             target,
@@ -219,6 +224,7 @@ static void ghost_exchange_front_back(
         }
     }
 }
+
 
 void comm_handler_ghost_exchange(comm_handler_t const* self, mesh_t* mesh) {
     // Left to right phase
