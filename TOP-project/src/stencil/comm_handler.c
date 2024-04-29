@@ -149,35 +149,33 @@ static void ghost_exchange_top_bottom(comm_handler_t const* self, mesh_t* mesh, 
         return;
     }
 
-    for (usz i = 0; i < mesh->dim_x; ++i) {
-        for (usz j = y_start; j < y_start + STENCIL_ORDER; ++j) {
-            for (usz k = 0; k < mesh->dim_z; ++k) {
-                usz idx = i * mesh->dim_y * mesh->dim_z + j * mesh->dim_z + k;
-                switch (comm_kind) {
-                    case COMM_KIND_SEND_OP:
-                        MPI_Send(
-                            &mesh->cells.value[idx], 1, MPI_DOUBLE, target, 0, MPI_COMM_WORLD
-                        );
-                        break;
-                    case COMM_KIND_RECV_OP:
-                        MPI_Recv(
-                            &mesh->cells.value[idx],
-                            1,
-                            MPI_DOUBLE,
-                            target,
-                            0,
-                            MPI_COMM_WORLD,
-                            MPI_STATUS_IGNORE
-                        );
-                        break;
-                    default:
-                        __builtin_unreachable();
-                }
-            }
-        }
+    // Calculate the size of the block to send or receive
+    int block_size = mesh->dim_x * STENCIL_ORDER * mesh->dim_z;
+
+    // Calculate the displacement for sending or receiving data
+    usz idx = y_start * mesh->dim_z;
+
+    switch (comm_kind) {
+        case COMM_KIND_SEND_OP:
+            MPI_Send(
+                &mesh->cells.value[idx], block_size, MPI_DOUBLE, target, 0, MPI_COMM_WORLD
+            );
+            break;
+        case COMM_KIND_RECV_OP:
+            MPI_Recv(
+                &mesh->cells.value[idx],
+                block_size,
+                MPI_DOUBLE,
+                target,
+                0,
+                MPI_COMM_WORLD,
+                MPI_STATUS_IGNORE
+            );
+            break;
+        default:
+            __builtin_unreachable();
     }
 }
-
 
 static void ghost_exchange_front_back(comm_handler_t const* self, mesh_t* mesh, comm_kind_t comm_kind, i32 target, usz z_start) {
     if (target < 0) {
