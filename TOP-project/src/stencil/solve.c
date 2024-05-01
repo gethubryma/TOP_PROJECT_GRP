@@ -50,9 +50,9 @@ void solve_jacobi(mesh_t* A, mesh_t const* B, mesh_t* C) {
         for(usz jj = STENCIL_ORDER; jj < dim_y - STENCIL_ORDER ; jj += BLOCK_SIZE_Y){
             for(usz ii = STENCIL_ORDER; ii < dim_x - STENCIL_ORDER ; ii += BLOCK_SIZE_X){
 
-                for (usz k = kk; k < min(dim_z - STENCIL_ORDER, kk + BLOCK_SIZE_Z); ++k) {
+                for (usz i = ii; i < min(dim_x - STENCIL_ORDER, ii + BLOCK_SIZE_X); ++i) {
                     for (usz j =  jj ; j < min(dim_y - STENCIL_ORDER,jj + BLOCK_SIZE_Y); ++j) {
-                        for (usz i = ii ; i < min(dim_x - STENCIL_ORDER, ii + BLOCK_SIZE_X); ++i) {
+                        for (usz k = kk ; k < min(dim_z - STENCIL_ORDER, kk + BLOCK_SIZE_Z); ++k) {
                             usz idx = i * dim_y * dim_z + j * dim_z + k;
                             C->cells.value[idx] = A->cells.value[idx] * B->cells.value[idx];
 
