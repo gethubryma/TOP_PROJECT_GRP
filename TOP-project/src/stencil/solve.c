@@ -42,8 +42,8 @@ void solve_jacobi(mesh_t* A, mesh_t const* B, mesh_t* C) {
 
     
     f64 powers[STENCIL_ORDER];
-    for (usz o = 0; o < STENCIL_ORDER; ++o) {
-        powers[o] = power_of_17((f64)o);
+    for (usz o = 1; o <= STENCIL_ORDER; ++o) {
+        powers[o-1] = 1.0 / power_of_17((f64)o);
     }
 
     for(usz kk = STENCIL_ORDER; kk < dim_z - STENCIL_ORDER ; kk+=BLOCK_SIZE_Z ){
@@ -58,17 +58,17 @@ void solve_jacobi(mesh_t* A, mesh_t const* B, mesh_t* C) {
 
                             for (usz o = 1; o <= STENCIL_ORDER; ++o) {
                                 C->cells.value[idx] += A->cells.value[(i + o) * dim_y * dim_z + j * dim_z + k] *
-                                                        B->cells.value[(i + o) * dim_y * dim_z + j * dim_z + k] / powers[o];
+                                                        B->cells.value[(i + o) * dim_y * dim_z + j * dim_z + k] * powers[o-1];
                                 C->cells.value[idx] += A->cells.value[(i - o) * dim_y * dim_z + j * dim_z + k] *
-                                                        B->cells.value[(i - o) * dim_y * dim_z + j * dim_z + k] / powers[o];
+                                                        B->cells.value[(i - o) * dim_y * dim_z + j * dim_z + k] * powers[o-1];
                                 C->cells.value[idx] += A->cells.value[i * dim_y * dim_z + (j + o) * dim_z + k] *
-                                                        B->cells.value[i * dim_y * dim_z + (j + o) * dim_z + k] / powers[o];
+                                                        B->cells.value[i * dim_y * dim_z + (j + o) * dim_z + k] * powers[o-1];
                                 C->cells.value[idx] += A->cells.value[i * dim_y * dim_z + (j - o) * dim_z + k] *
-                                                        B->cells.value[i * dim_y * dim_z + (j - o) * dim_z + k] / powers[o];
+                                                        B->cells.value[i * dim_y * dim_z + (j - o) * dim_z + k] * powers[o-1];
                                 C->cells.value[idx] += A->cells.value[i * dim_y * dim_z + j * dim_z + (k + o)] *
-                                                        B->cells.value[i * dim_y * dim_z + j * dim_z + (k + o)] / powers[o];
+                                                        B->cells.value[i * dim_y * dim_z + j * dim_z + (k + o)] * powers[o-1];
                                 C->cells.value[idx] += A->cells.value[i * dim_y * dim_z + j * dim_z + (k - o)] *
-                                                        B->cells.value[i * dim_y * dim_z + j * dim_z + (k - o)] / powers[o];
+                                                        B->cells.value[i * dim_y * dim_z + j * dim_z + (k - o)] * powers[o-1];
                             }
                         }
                     } 
@@ -78,5 +78,4 @@ void solve_jacobi(mesh_t* A, mesh_t const* B, mesh_t* C) {
     }
     mesh_copy_core(A, C);
 }
-
 
