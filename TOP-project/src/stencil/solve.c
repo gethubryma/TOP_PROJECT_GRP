@@ -42,10 +42,13 @@ void solve_jacobi(mesh_t* A, mesh_t const* B, mesh_t* C) {
 
     
     f64 powers[STENCIL_ORDER];
+    #pragma omp parallel for schedule(static) 
     for (usz o = 1; o <= STENCIL_ORDER; ++o) {
+        #pragma omp critical
         powers[o-1] = 1.0 / power_of_17((f64)o);
     }
 
+    #pragma omp parallel for collapse(3) schedule(static)
     for(usz kk = STENCIL_ORDER; kk < dim_z - STENCIL_ORDER ; kk+=BLOCK_SIZE_Z ){
         for(usz jj = STENCIL_ORDER; jj < dim_y - STENCIL_ORDER ; jj += BLOCK_SIZE_Y){
             for(usz ii = STENCIL_ORDER; ii < dim_x - STENCIL_ORDER ; ii += BLOCK_SIZE_X){
