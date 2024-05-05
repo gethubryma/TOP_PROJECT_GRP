@@ -5,12 +5,15 @@
 
 #include <assert.h>
 #include <math.h>
+#include <omp.h>
 
 static f64 compute_core_pressure(usz i, usz j, usz k) {
     return sin((f64)k * cos((f64)i + 0.311) * cos((f64)j + 0.817) + 0.613);
 }
 
 static void setup_mesh_cell_values(mesh_t* mesh, comm_handler_t const* comm_handler) {
+    
+    #pragma omp parallel for schedule(static,2)
     for (usz i = 0; i < mesh->dim_x; ++i) {
         for (usz j = 0; j < mesh->dim_y; ++j) {
             for (usz k = 0; k < mesh->dim_z; ++k) {
